@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Trial Balance</title>
+</head>
+<body>
+
+<input type="file" id="file" accept=".xlsx,.xls">
+<button onclick="upload()">Upload</button>
+
+<p id="status"></p>
+
+<script>
+async function upload() {
+
+    const file = document.getElementById("file").files[0];
+
+    if (!file) {
+        alert("Select an Excel file.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = async function(e){
+
+        const base64 = e.target.result.split(",")[1];
+
+        const response = await fetch(
+            "YOUR_WEB_APP_URL",
+            {
+                method: "POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    filename: file.name,
+                    mimeType: file.type,
+                    data: base64
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        document.getElementById("status").innerHTML =
+            JSON.stringify(result);
+    };
+
+    reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
